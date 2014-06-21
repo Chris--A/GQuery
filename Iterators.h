@@ -133,6 +133,14 @@
 	};
 	
 	
+	template< typename Data, typename IdxType >
+		struct StaticAssign{
+			StaticAssign( const Data &data, const IdxType &index ) : data( data ), index( index ) {}
+			const Data &data;
+			const IdxType &index;
+	};	
+		
+	
 	/*--- Shortcut define for RunIterators assignment operators. ---*/
 	#define AssignSingle( op ) RunIterators operator op( const typename Info::UnderlyingType &u ){ \
 		for( index_t( NumIterations ) index = Iter::Start ; index < NumIterations ; index += Iter::Step ) \
@@ -214,6 +222,29 @@
 			AssignSingle( <<= );
 			AssignSingle( >>= );
 			
+			/*--- Static iterator attempt ---*/
+			
+			template< typename Data, typename IdxType >
+				RunIterators operator =( const StaticAssign< Data, IdxType > &s ){
+				
+				
+				//Are we at the end of the list?
+				if( IsSameType< typename List::Tail, NullType >::value ){
+				
+					for( index_t( NumIterations ) index = Iter::Start ; index < NumIterations ; index += Iter::Step )
+						ObjType( SubType( this->t )[ index ] )[ s.index ] = s.data;				
+				
+					//ObjType( SubType( this->t )[ s.index ] ) = s.data;
+				
+				//No, keep iterating.
+				}else{
+				
+					for( index_t( NumIterations ) index = Iter::Start ; index < NumIterations ; index += Iter::Step )
+						ObjType( SubType( this->t )[ index ] ).operator =( s );
+				}
+				return *this;
+			}				
+			
 			T &t;
 		};
 		
@@ -228,13 +259,19 @@
 	---*/
 	
 	
-	template< typename T, typename List >
+	template< typename T, typename List, typename IdxType >
 		struct StaticIterator{
-	
+
+			StaticIterator( T &t, IdxType index ) : t( t ), index( index ) {}
 			
-		
+			
+			typename QueryType< T >::Result operator =( const typename ArrayInfo< T >::UnderlyingType &u ){ 
+				RunIterators< T, List >( this->t ) = StaticAssign< typename ArrayInfo< T >::UnderlyingType, IdxType >( u, this->index );
+				return typename QueryType< T >::Result( this->t );
+			}
+			
 			T &t;
-			int index;
+			IdxType index;
 	};
 		
 	/*---
@@ -274,6 +311,11 @@
 				IteratorList< T, typename TL::Append< List, I >::Result >	operator []( const IterationMode< I > &i ){ 
 					return IteratorList< T, typename TL::Append< List, I >::Result >( this->t ); 
 			}
+			
+			/*--- Append a static iterator to the list ---*/
+			StaticIterator< T, List, uint16_t >	operator []( const uint16_t &i ){ 
+				return StaticIterator< T, List, uint16_t >( this->t, i ); 
+			}			
 			
 			/*--- Append a single step iterator to the list. ---*/
 			/*IteratorList< T, typename TL::Append< List, I >::Result >	operator []( const int &i ){ 

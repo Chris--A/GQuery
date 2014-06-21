@@ -22,7 +22,7 @@
 	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 	THE SOFTWARE.
 ---*/
-                      #include "WProgram.h"
+
 /*---
 
 	GQuery, A jQuery inspired C++ Library.
@@ -78,6 +78,10 @@
 		
 		#define index_t( x )		typename BestFitInt< x >::Result
 		#define cindex_t( x )		const index_t( x )
+		
+		/*--- An accessor for CRTP based entities. ---*/
+		#define DERIVED_TO_SELF		D& self() { return *static_cast< D* >( this ); } \
+									const D& self() const { return *static_cast< const D* >( this ); }		
 		
 		/*--- Forward declaration of standard interfaces. ---*/
 		template< typename T > struct 				InterfaceBase;
@@ -359,15 +363,13 @@
 					};
 				protected:
 				private:
-					D& self() { return *static_cast< D* >( this ); }
-					const D& self() const { return *static_cast< const D* >( this ); }
+					DERIVED_TO_SELF;
 		};
 		
 		template< typename D >
 			struct QAIDummy{
 				D index( void ){ return D( self().t ); }
-				D& self() { return *static_cast< D* >( this ); }
-				const D& self() const { return *static_cast< const D* >( this ); }
+				DERIVED_TO_SELF;
 		};		
 		
 		#undef Node
