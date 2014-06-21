@@ -79,9 +79,7 @@
 		#define index_t( x )		typename BestFitInt< x >::Result
 		#define cindex_t( x )		const index_t( x )
 		
-		/*--- An accessor for CRTP based entities. ---*/
-		#define DERIVED_TO_SELF		D& self() { return *static_cast< D* >( this ); } \
-									const D& self() const { return *static_cast< const D* >( this ); }		
+		
 		
 		/*--- Forward declaration of standard interfaces. ---*/
 		template< typename T > struct 				InterfaceBase;
@@ -104,6 +102,8 @@
 				>::Result Result;
 		};	
 	
+		/*--- Terrible C based helpers ---*/
+		#include "Macros.h"
 		
 		/*--- Built in features. ---*/
 		#include "Iterators.h"

@@ -174,10 +174,9 @@
 	}
 
 	template< typename T, typename List >
-		struct RunIterators : public RunIteratorHelper< RunIterators< T, List >, IsSameType< typename List::Tail, NullType >::value  > {
-		//struct RunIterators {
+		struct RunIterators : public RunIteratorHelper< RunIterators< T, List >, EOL  > {
 		
-			using RunIteratorHelper< RunIterators< T, List >, IsSameType< typename List::Tail, NullType >::value  >::operator =;
+			using RunIteratorHelper< RunIterators< T, List >, EOL >::operator =;
 
 			typedef ArrayInfo< T > Info; //Size will be zero for non-arrays.
 			typedef typename List::Head Iter;
@@ -199,7 +198,7 @@
 			typedef typename Select< Info::IsAnArray, T&, typename QueryType< T >::Result >::Result SubType;
 			
 			typedef typename Select< 
-				IsSameType< typename List::Tail, NullType >::value, /*--- Is end of list? Select GQuery type to iterate. ---*/
+				EOL, /*--- Is end of list? Select GQuery type to iterate. ---*/
 				typename Select< IsCharType, BitRef::DataRef, typename QueryType< typename Info::NextType >::Result >::Result, 
 				RunIterators< typename Info::NextType, typename List::Tail > /*--- Otherwise, continue nesting iteration. ---*/
 			>::Result ObjType;
@@ -218,9 +217,7 @@
 				Copy a single value to the iterator list. 
 				These operators are defined using the macro AssignSingle located above IteratorList class.
 			---*/
-			
-	
-			
+
 			AssignSingle( = );
 			AssignSingle( += );
 			AssignSingle( -= );
@@ -233,29 +230,7 @@
 			AssignSingle( >>= );
 			
 			T &t;
-			
-			/*--- Static iterator attempt ---*/
-			
-			/*template< typename Data, typename IdxType >
-				RunIterators operator =( const StaticAssign< Data, IdxType > &s ){
 				
-				
-				//Are we at the end of the list?
-				if( IsSameType< typename List::Tail, NullType >::value ){
-				
-					for( index_t( NumIterations ) index = Iter::Start ; index < NumIterations ; index += Iter::Step )
-						ObjType( SubType( this->t )[ index ] )[ s.index ] = s.data;				
-				
-					//ObjType( SubType( this->t )[ s.index ] ) = s.data;
-				
-				//No, keep iterating.
-				}else{
-				
-					for( index_t( NumIterations ) index = Iter::Start ; index < NumIterations ; index += Iter::Step )
-						ObjType( SubType( this->t )[ index ] ).operator =( s );
-				}
-				return *this;
-			}	*/		
 
 			/*RunIterators operator =( const typename Info::UnderlyingType &u ){ 
 
@@ -345,12 +320,7 @@
 			/*--- Append a static iterator to the list ---*/
 			StaticIterator< T, List, uint16_t >	operator []( const uint16_t &i ){ 
 				return StaticIterator< T, List, uint16_t >( this->t, i ); 
-			}			
-			
-			/*--- Append a single step iterator to the list. ---*/
-			/*IteratorList< T, typename TL::Append< List, I >::Result >	operator []( const int &i ){ 
-				return IteratorList< T, typename TL::Append< List, I >::Result >( this->t ); 
-			}*/		
+			}	
 			
 			/*--- each methods for iterators. ---*/
 			template< typename FuncT >
@@ -358,21 +328,6 @@
 					RunIterators< T, List >( this->t ).each( func );
 					return typename QueryType< T >::Result( this->t );
 			}			
-			/*template< typename FuncT, typename ParamA >
-				typename QueryType< T >::Result each( FuncT(*func)( ParamA, typename ArrayInfo< T >::NextType &n ) ){
-				RunIterators< T, List >( this->t ).each( func );
-				return typename QueryType< T >::Result( this->t );
-			}
-			
-			template< typename FuncT, typename ParamA >
-				typename QueryType< T >::Result each( FuncT(*func)( ParamA, typename ArrayInfo< T >::NextType n ) ){
-				RunIterators< T, List >( this->t ).each( func );
-				return typename QueryType< T >::Result( this->t );
-			}*/	
-			/*--- 
-				Copy a single value to the iterator list. 
-				These operators are defined using the macro AssignSingle located above IteratorList class.
-			---*/
 			
 			AssignSingle( = );
 			AssignSingle( += );
@@ -387,17 +342,26 @@
 
 			//Reference of type to be iterated.
 			T &t;	
+			
+			
+			/*template< typename FuncT, typename ParamA >
+				typename QueryType< T >::Result each( FuncT(*func)( ParamA, typename ArrayInfo< T >::NextType &n ) ){
+				RunIterators< T, List >( this->t ).each( func );
+				return typename QueryType< T >::Result( this->t );
+			}
+			
+			template< typename FuncT, typename ParamA >
+				typename QueryType< T >::Result each( FuncT(*func)( ParamA, typename ArrayInfo< T >::NextType n ) ){
+				RunIterators< T, List >( this->t ).each( func );
+				return typename QueryType< T >::Result( this->t );
+			}*/	
+			/*--- 
+				Copy a single value to the iterator list. 
+				These operators are defined using the macro AssignSingle located above IteratorList class.
+			---*/			
 	};
 	
 	#undef AssignSingle
-	
-	
-	
-	
-	
-	
-	
-	
 	
 #endif
 //EOF
