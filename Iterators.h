@@ -139,7 +139,32 @@
 			const Data &data;
 			const IdxType &index;
 	};	
+	
 		
+	template< typename D, bool Continue >
+		struct RunIteratorHelper{
+			DERIVED_TO_SELF;
+			template< typename Data, typename IdxType >
+				D operator =( const StaticAssign< Data, IdxType > &s ){
+					for( index_t( D::NumIterations ) index = D::Iter::Start ; index < D::NumIterations ; index += D::Iter::Step )
+						typename D::ObjType( typename D::SubType( this->self().t )[ index ] ) = s;
+					return this->self();
+			}
+			
+	};
+	
+	
+	template< typename D >
+		struct RunIteratorHelper< D, true >{
+			DERIVED_TO_SELF;
+			template< typename Data, typename IdxType >
+				D operator =( const StaticAssign< Data, IdxType > &s ){
+					for( index_t( D::NumIterations ) index = D::Iter::Start ; index < D::NumIterations ; index += D::Iter::Step )
+						typename D::ObjType( typename D::SubType( this->self().t )[ index ] )[ s.index ] = s.data;
+					return this->self();
+			}
+	};
+	
 	
 	/*--- Shortcut define for RunIterators assignment operators. ---*/
 	#define AssignSingle( op ) RunIterators operator op( const typename Info::UnderlyingType &u ){ \
@@ -149,7 +174,10 @@
 	}
 
 	template< typename T, typename List >
-		struct RunIterators{
+		struct RunIterators : public RunIteratorHelper< RunIterators< T, List >, IsSameType< typename List::Tail, NullType >::value  > {
+		//struct RunIterators {
+		
+			using RunIteratorHelper< RunIterators< T, List >, IsSameType< typename List::Tail, NullType >::value  >::operator =;
 
 			typedef ArrayInfo< T > Info; //Size will be zero for non-arrays.
 			typedef typename List::Head Iter;
@@ -191,25 +219,7 @@
 				These operators are defined using the macro AssignSingle located above IteratorList class.
 			---*/
 			
-			/*RunIterators operator =( const typename Info::UnderlyingType &u ){ 
-
-				if( Iter::Step ){
-				
-					if( StartIsNeg ){
-					
-						for( index_t( NumIterations ) index = Iter::Start ; index < NumIterations ; index += Iter::Step ) 
-							ObjType( SubType( this->t )[ index ] ) = u; 
-							
-					}else{
-					
-						for( index_t( NumIterations ) index = NumIterations + Iter::Start ; index < NumIterations ; index += Iter::Step ) 
-							ObjType( SubType( this->t )[ index ] ) = u; 					
-					}
-				}else{
-				
-				}
-				return *this; 
-			}	*/		
+	
 			
 			AssignSingle( = );
 			AssignSingle( += );
@@ -222,9 +232,11 @@
 			AssignSingle( <<= );
 			AssignSingle( >>= );
 			
+			T &t;
+			
 			/*--- Static iterator attempt ---*/
 			
-			template< typename Data, typename IdxType >
+			/*template< typename Data, typename IdxType >
 				RunIterators operator =( const StaticAssign< Data, IdxType > &s ){
 				
 				
@@ -243,9 +255,27 @@
 						ObjType( SubType( this->t )[ index ] ).operator =( s );
 				}
 				return *this;
-			}				
-			
-			T &t;
+			}	*/		
+
+			/*RunIterators operator =( const typename Info::UnderlyingType &u ){ 
+
+				if( Iter::Step ){
+				
+					if( StartIsNeg ){
+					
+						for( index_t( NumIterations ) index = Iter::Start ; index < NumIterations ; index += Iter::Step ) 
+							ObjType( SubType( this->t )[ index ] ) = u; 
+							
+					}else{
+					
+						for( index_t( NumIterations ) index = NumIterations + Iter::Start ; index < NumIterations ; index += Iter::Step ) 
+							ObjType( SubType( this->t )[ index ] ) = u; 					
+					}
+				}else{
+				
+				}
+				return *this; 
+			}	*/				
 		};
 		
 	#undef AssignIterator
