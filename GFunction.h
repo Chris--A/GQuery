@@ -24,44 +24,31 @@
 ---*/
 
 
-#ifndef HEADER_GOBJECT
-	#define HEADER_GOBJECT
-
-	/*---
-		ObjectAccess implements access to raw object bytes and is also responsible for bit manipulation features.
-	---*/	
+/*
+	template< typename T > 
+		struct QueryFunctionInterfaceInitializer{
+	
+		QueryFunctionInterfaceInitializer( T &t ) : t( t ) {}
+		
+		
+		T &t;
+	};
 	
 	template< typename T > 
-		struct ObjectAccess{ 
-			typedef QueryInterface< T > Result; 
-			static Result Call( T &t, uint8_t i ){ return Result( *( ( ( unsigned char* ) &t ) + i ) ); } 
-	};
-
-	template<> 
-		struct ObjectAccess< char >{
-			typedef BitRef::DataRef Result;
-			static Result Call( char &t, uint8_t i ){ return Result( *( unsigned char* ) &t, i ); }			
-	};		
+		struct QueryFunctionInterface{
 	
-	template<> 
-		struct ObjectAccess< unsigned char >{
-			typedef BitRef::DataRef Result;
-			static Result Call( unsigned char &t, uint8_t i ){ return Result( t, i ); }			
-	};
-	/*
-	template< template< typename > class T, typename U >
-		struct ObjectAccess< T< U > >{
-			typedef const typename ObjectAccess< U >::Result Result;
-			static Result Call( T< U > &t, uint8_t i ){ 
-				struct TempHold{ 
-					TempHold( T< U > &tt ) : u( ( U ) tt ) {}
-					U u;
-				} th( t );
-				return Result( th.u, i ); 
-			}			
-			
-	};*/
+		QueryFunctionInterface( T &t ) : t( t ) {}
+		
+		
+		T &t;
+	};	
 	
-#endif
-
-//EOF
+	
+	template< typename T, typename PA > 
+		struct QueryFunctionInterface< T >{
+	
+		QueryFunctionInterface( T &t ) : t( t ) {}
+		
+		
+		T &t;
+	};		*/

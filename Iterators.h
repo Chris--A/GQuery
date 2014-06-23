@@ -2,7 +2,7 @@
 /*---
 	The MIT License (MIT)
 
-	Copyright (c) 2014 Christopher Andrews, genx.biz
+	Copyright (c) 2014 Christopher Andrews, http://Arduino.land
 
 	Permission is hereby granted, free of charge, to any person obtaining a copy
 	of this software and associated documentation files (the "Software"), to deal
@@ -143,7 +143,7 @@
 		
 	template< typename D, bool Continue >
 		struct RunIteratorHelper{
-			DERIVED_TO_SELF;
+			CRTP_SELF;
 			template< typename Data, typename IdxType >
 				D operator =( const StaticAssign< Data, IdxType > &s ){
 					for( index_t( D::NumIterations ) index = D::Iter::Start ; index < D::NumIterations ; index += D::Iter::Step )
@@ -156,7 +156,7 @@
 	
 	template< typename D >
 		struct RunIteratorHelper< D, true >{
-			DERIVED_TO_SELF;
+			CRTP_SELF;
 			template< typename Data, typename IdxType >
 				D operator =( const StaticAssign< Data, IdxType > &s ){
 					for( index_t( D::NumIterations ) index = D::Iter::Start ; index < D::NumIterations ; index += D::Iter::Step )

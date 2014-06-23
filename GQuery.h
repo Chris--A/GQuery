@@ -2,7 +2,7 @@
 /*---
 	The MIT License (MIT)
 
-	Copyright (c) 2014 Christopher Andrews, genx.biz
+	Copyright (c) 2014 Christopher Andrews, http://Arduino.land
 
 	Permission is hereby granted, free of charge, to any person obtaining a copy
 	of this software and associated documentation files (the "Software"), to deal
@@ -74,17 +74,14 @@
 		struct MissingType{};
 		#define Node Typelist
 
-		//#define _ ::_GQuery()
-		
-		#define index_t( x )		typename BestFitInt< x >::Result
-		#define cindex_t( x )		const index_t( x )
-		
+		//#define _ ::_GQuery()	
 		
 		
 		/*--- Forward declaration of standard interfaces. ---*/
 		template< typename T > struct 				InterfaceBase;
 		template< typename T > struct 				QueryInterface;
 		template< typename T > struct 				QueryPointerInterface;
+		template< typename T > struct 				QueryFunctionInterface;
 		template< typename T > struct 				QueryArrayInterface;
 		//template< typename I, typename T > struct 	QueryIteratorInterface;		//Located in Iterators.h
 		
@@ -101,6 +98,17 @@
 					>::Result
 				>::Result Result;
 		};	
+		/*
+		template< typename T >
+			struct QueryType{ 
+				typedef typename Select< 
+					IsArrayType< T >::Value, QueryArrayInterface< T >, typename Select< 
+						TypeTraits< T >::isFunction, B, typename Select< 
+							TypeTraits< T >::isPointer, QueryPointerInterface< T >, QueryInterface< T > 
+						>::Result 
+					>::Result
+				>::Result Result;
+		};*/		
 	
 		/*--- Terrible C based helpers ---*/
 		#include "Macros.h"
@@ -108,6 +116,7 @@
 		/*--- Built in features. ---*/
 		#include "Iterators.h"
 		#include "GObject.h"
+		#include "GFunction.h"
 		
 		/*--- Modules for specialised cases. ---*/
 		#include "GModule_AVR8.h"
@@ -363,13 +372,13 @@
 					};
 				protected:
 				private:
-					DERIVED_TO_SELF;
+					CRTP_SELF;
 		};
 		
 		template< typename D >
 			struct QAIDummy{
 				D index( void ){ return D( self().t ); }
-				DERIVED_TO_SELF;
+				CRTP_SELF;
 		};		
 		
 		#undef Node
@@ -455,7 +464,7 @@
 		As of writing this I still have not found a way to implement features that
 		constexpr would otherwise allow ( without undesired overhead ). Also a number 
 		of small template classes are used to overcome the lack of constexpr. This 
-		causes complexity in the code that would otherwise be unessecary.
+		causes complexity in the code that would otherwise be unnecessary.
 		
 	Inheriting Constructors:
 
