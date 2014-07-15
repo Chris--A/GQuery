@@ -335,18 +335,26 @@
 					
 					Allows iteration over objects using a callback.
 				---*/
-				template< typename FuncT, typename ParamA >
-					QueryArrayInterface< T > each( FuncT(*func)( ParamA, Next n ) ){
-						for( index_t( Info::First ) index = 0x00 ; index < Info::First ; ++index ) func( index, this->t[ index ] );
-						return QueryArrayInterface< T >( this->t );
-				}
 				
 				template< typename FuncT >
-					QueryArrayInterface< T > each( FuncT(*func)( Next n ) ){
+					QueryArrayInterface< T > each( FuncT func ){
 						for( index_t( Info::First ) index = 0x00 ; index < Info::First ; func( this->t[ index++ ] ) );
 						return QueryArrayInterface< T >( this->t );
 				}
-
+				
+				
+				/*template< typename FuncT, typename ParamA >
+					QueryArrayInterface< T > each( FuncT(*func)( ParamA, Next n ) ){
+						for( index_t( Info::First ) index = 0x00 ; index < Info::First ; ++index ) func( index, this->t[ index ] );
+						return QueryArrayInterface< T >( this->t );
+				}*/
+				
+				/*template< typename FuncT >
+					QueryArrayInterface< T > each( FuncT(*func)( Next n ) ){
+						for( index_t( Info::First ) index = 0x00 ; index < Info::First ; func( this->t[ index++ ] ) );
+						return QueryArrayInterface< T >( this->t );
+				}*/
+/*
 				template< typename FuncT, typename ParamA >
 					QueryArrayInterface< T > each( FuncT(*func)( ParamA, Next &n ) ){
 						for( index_t( Info::First ) index = 0x00 ; index < Info::First ; ++index ) func( index, this->t[ index ] );
@@ -357,7 +365,7 @@
 					QueryArrayInterface< T > each( FuncT(*func)( Next &n ) ){
 						for( index_t( Info::First ) index = 0x00 ; index < Info::First ; func( this->t[ index++ ] ) );
 						return QueryArrayInterface< T >( this->t );
-				}		
+				}*/		
 		};
 		
 		template< typename D >

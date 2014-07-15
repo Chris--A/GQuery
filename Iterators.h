@@ -363,5 +363,18 @@
 	
 	#undef AssignSingle
 	
+	
+	/*--- Second attempt at mixing dynamic and static iterators. ---*/
+	template< typename T, typename List, unsigned N >
+		class IteratorCollection{
+		
+		IteratorCollection( T &t ) : t( t ) {}
+		
+		T &t;
+		unsigned int Indices[ N ];
+	};
+	
+	
+	
 #endif
 //EOF
